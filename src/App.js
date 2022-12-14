@@ -20,7 +20,7 @@ const App = () => {
 
   useEffect(() => {
     faceapi
-      .loadSsdMobilenetv1Model('/models')
+      .loadSsdMobilenetv1Model('/classroom/models')
       .then((x) => {
         setFaceApiReady(true);
       })
