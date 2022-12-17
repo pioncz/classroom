@@ -147,53 +147,58 @@ function Classroom({ firstClick, onInitialized }) {
       );
 
     console.log('------', initialized);
-    faceapi.detectAllFaces(canvasRef.current).then((detections) => {
-      console.log('------', initialized);
-      setInitialized(true);
-      if (!detections.length) {
+    faceapi
+      .detectAllFaces(
+        canvasRef.current,
+        new faceapi.TinyFaceDetectorOptions(),
+      )
+      .then((detections) => {
+        console.log('------', initialized);
+        setInitialized(true);
+        if (!detections.length) {
+          initRef.current = true;
+          setTimeout(handleClickRoot, PhotoInterval);
+          return;
+        }
+
+        // Draw rectange
+        const { width, height } = canvasOverlayRef.current;
+        const ctx = canvasOverlayRef.current.getContext('2d');
+        const {
+          left,
+          top,
+          width: widthDetection,
+          height: heightDetection,
+        } = detections[0].box;
+
+        ctx.clearRect(0, 0, width, height);
+        ctx.beginPath();
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.rect(left, top, widthDetection, heightDetection);
+        ctx.stroke();
+        ctx.closePath();
+
+        if (initRef.current) {
+          photoControls.start({
+            opacity: [0, 1, 1, 1, 1],
+            filter: [
+              'brightness(0)',
+              'brightness(4)',
+              'brightness(1)',
+              'brightness(1)',
+              'brightness(1)',
+            ],
+            scale: [1, 1, 1, 1, 0],
+            transition: {
+              times: [0, 0.02, 0.06, 0.8, 1],
+              duration: 3.5,
+            },
+          });
+        }
         initRef.current = true;
         setTimeout(handleClickRoot, PhotoInterval);
-        return;
-      }
-
-      // Draw rectange
-      const { width, height } = canvasOverlayRef.current;
-      const ctx = canvasOverlayRef.current.getContext('2d');
-      const {
-        left,
-        top,
-        width: widthDetection,
-        height: heightDetection,
-      } = detections[0].box;
-
-      ctx.clearRect(0, 0, width, height);
-      ctx.beginPath();
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.rect(left, top, widthDetection, heightDetection);
-      ctx.stroke();
-      ctx.closePath();
-
-      if (initRef.current) {
-        photoControls.start({
-          opacity: [0, 1, 1, 1, 1],
-          filter: [
-            'brightness(0)',
-            'brightness(4)',
-            'brightness(1)',
-            'brightness(1)',
-            'brightness(1)',
-          ],
-          scale: [1, 1, 1, 1, 0],
-          transition: {
-            times: [0, 0.02, 0.06, 0.8, 1],
-            duration: 3.5,
-          },
-        });
-      }
-      initRef.current = true;
-      setTimeout(handleClickRoot, PhotoInterval);
-    });
+      });
   }, [photoControls, initialized]);
 
   useEffect(() => {
@@ -217,32 +222,32 @@ function Classroom({ firstClick, onInitialized }) {
     {
       id: 0,
       type: 'video/mp4',
-      src: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      src: './mov_bbb.webm',
     },
     {
       id: 1,
       type: 'video/webm',
-      src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
+      src: './flower.webm',
     },
     {
       id: 2,
       type: 'video/mp4',
-      src: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      src: './mov_bbb.mp4',
     },
     {
       id: 3,
       type: 'video/webm',
-      src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
+      src: './flower.webm',
     },
     {
       id: 4,
       type: 'video/mp4',
-      src: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      src: './mov_bbb.mp4',
     },
     {
       id: 5,
       type: 'video/webm',
-      src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
+      src: './flower.webm',
     },
     {
       id: 6,
@@ -251,7 +256,7 @@ function Classroom({ firstClick, onInitialized }) {
     {
       id: 7,
       type: 'video/mp4',
-      src: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      src: './mov_bbb.mp4',
     },
   ];
 

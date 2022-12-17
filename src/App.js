@@ -14,13 +14,12 @@ const Root = styled.div`
 const App = () => {
   const [faceApiReady, setFaceApiReady] = useState(false);
   const [timeoutReady, setTimeoutReady] = useState(false);
-  const [started, setStarted] = useState(false);
   const [firstClick, setFirstClick] = useState(false);
   const [videoInitialized, setVideoInitialized] = useState(false);
 
   useEffect(() => {
     faceapi
-      .loadSsdMobilenetv1Model('/classroom/models')
+      .loadTinyFaceDetectorModel('./models')
       .then((x) => {
         setFaceApiReady(true);
       })
