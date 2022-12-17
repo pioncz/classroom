@@ -19,7 +19,7 @@ const App = () => {
 
   useEffect(() => {
     faceapi
-      .loadTinyFaceDetectorModel('./models')
+      .loadTinyFaceDetectorModel('/classroom/models')
       .then((x) => {
         setFaceApiReady(true);
       })
