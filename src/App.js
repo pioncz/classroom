@@ -39,8 +39,7 @@ const App = () => {
     }, 2000);
   }, []);
 
-  const appReady =
-    videoInitialized && timeoutReady && faceApiReady && false;
+  const appReady = videoInitialized && timeoutReady && faceApiReady;
 
   const welcomeClickHandler = () => {
     if (!firstClick) {
@@ -53,7 +52,7 @@ const App = () => {
       <Classroom
         firstClick={firstClick}
         onInitialized={() => {
-          console.log('setVideoInitialized');
+          console.log('Video initialized');
           setVideoInitialized(true);
         }}
       />

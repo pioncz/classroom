@@ -94,13 +94,8 @@ function Classroom({ firstClick, onInitialized }) {
     }
   }, [initialized, onInitialized]);
 
-  // const detectFaces = useCallback(
-  //   ,
-  //   [initialized, handleClickRoot, photoControls],
-  // );
-
   const handleClickRoot = useCallback(() => {
-    console.log('click root');
+    console.log('Start making photo');
     const video = videoRef.current;
 
     const canvas = canvasRef.current;
@@ -146,14 +141,12 @@ function Classroom({ firstClick, onInitialized }) {
         canvasRef.current.height,
       );
 
-    console.log('------', initialized);
     faceapi
       .detectAllFaces(
         canvasRef.current,
         new faceapi.TinyFaceDetectorOptions(),
       )
       .then((detections) => {
-        console.log('------', initialized);
         setInitialized(true);
         if (!detections.length) {
           initRef.current = true;
@@ -203,7 +196,7 @@ function Classroom({ firstClick, onInitialized }) {
 
   useEffect(() => {
     if (firstClick && !initialized) {
-      console.log('get media devices');
+      console.log('Get media devices (video)');
       navigator.mediaDevices
         .getUserMedia({
           video: true,
