@@ -40,6 +40,7 @@ const VideoBox = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  box-sizing: content-box;
 
   border: 3px solid
     ${(props) => (props.selected ? '#69ffac' : '#232323')};
@@ -58,19 +59,20 @@ const VideoBox = styled.div`
     width: 100%;
     height: 100%;
   }
+`;
+
+const PhotoWrapper = styled(motion.div)`
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
 
   canvas {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    transform-origin: top right;
-  }
-
-  #test {
-    position: absolute;
-    width: 100%;
-    height: 100%;
   }
 `;
 
@@ -85,11 +87,19 @@ const StyledChatBar = styled(ChatBar)`
   flex: 0 0 350px;
 `;
 
-const PhotoInterval = 10 * 1000;
+const PhotoInterval = 5 * 1000;
 
 function Classroom({ firstClick, onInitialized }) {
   const [initialized, setInitialized] = useState(false);
   const videoRef = useRef();
+  const videoContainerRef0 = useRef();
+  const videoContainerRef1 = useRef();
+  const videoContainerRef2 = useRef();
+  const videoContainerRef3 = useRef();
+  const videoContainerRef4 = useRef();
+  const videoContainerRef5 = useRef();
+  const videoContainerRef6 = useRef();
+  const videoContainerRef7 = useRef();
   const canvasRef = useRef();
   const canvasOverlayRef = useRef();
   const initRef = useRef(false);
@@ -104,18 +114,11 @@ function Classroom({ firstClick, onInitialized }) {
   const handleClickRoot = useCallback(() => {
     console.log('Start making photo');
     const video = videoRef.current;
-
     const canvas = canvasRef.current;
     const canvasOverlay = canvasOverlayRef.current;
     const { videoHeight: height, videoWidth: width } = video;
 
     if (!width || !height) return;
-
-    photoControls.set({
-      opacity: 0,
-      filter: 'brightness(0)',
-      scale: 1,
-    });
 
     const { width: elWidth, height: elHeight } =
       video.getBoundingClientRect();
@@ -161,6 +164,27 @@ function Classroom({ firstClick, onInitialized }) {
           return;
         }
 
+        const videoContainer = videos.find((vC) => !!vC.videoRef);
+
+        if (!videoContainer?.containerRef?.current) return;
+
+        const {
+          x: videoContainerX,
+          y: videoContainerY,
+          width: videoContainerWidth,
+          height: videoContainerHeight,
+        } = videoContainer.containerRef.current.getBoundingClientRect();
+
+        photoControls.set({
+          width: videoContainerWidth - 6,
+          height: videoContainerHeight - 6,
+          top: videoContainerY + 3,
+          left: videoContainerX + 3,
+          opacity: 0,
+          filter: 'brightness(0)',
+          scale: 1,
+        });
+
         // Draw rectange
         const { width, height } = canvasOverlayRef.current;
         const ctx = canvasOverlayRef.current.getContext('2d');
@@ -180,8 +204,13 @@ function Classroom({ firstClick, onInitialized }) {
         ctx.closePath();
 
         if (initRef.current) {
+          const { x: destinationX, y: destinationY } =
+            videos[0].containerRef.current.getBoundingClientRect();
+
           photoControls.start({
             opacity: [0, 1, 1, 1, 1],
+            top: destinationY + 3,
+            left: destinationX + 3,
             filter: [
               'brightness(0)',
               'brightness(4)',
@@ -189,7 +218,6 @@ function Classroom({ firstClick, onInitialized }) {
               'brightness(1)',
               'brightness(1)',
             ],
-            scale: [1, 1, 1, 1, 0],
             transition: {
               times: [0, 0.02, 0.06, 0.8, 1],
               duration: 3.5,
@@ -221,28 +249,36 @@ function Classroom({ firstClick, onInitialized }) {
   const videos = [
     {
       id: 0,
+      containerRef: videoContainerRef0,
     },
     {
       id: 1,
+      containerRef: videoContainerRef1,
     },
     {
       id: 2,
+      containerRef: videoContainerRef2,
     },
     {
       id: 3,
+      containerRef: videoContainerRef3,
     },
     {
       id: 4,
+      containerRef: videoContainerRef4,
     },
     {
       id: 5,
+      containerRef: videoContainerRef5,
     },
     {
       id: 6,
-      ref: videoRef,
+      videoRef: videoRef,
+      containerRef: videoContainerRef6,
     },
     {
       id: 7,
+      containerRef: videoContainerRef7,
     },
   ];
 
@@ -251,30 +287,22 @@ function Classroom({ firstClick, onInitialized }) {
       <TopBar />
       <MainContent>
         <VideoGrid>
-          {videos.map(({ id, ref, image }) => (
-            <VideoBox key={id} selected={!!ref}>
+          {videos.map(({ id, videoRef, containerRef }) => (
+            <VideoBox
+              key={id}
+              selected={!!videoRef}
+              ref={containerRef}
+            >
               <StyledSpinner size={60} strokeWidth={2} />
-              {!!ref ? (
+              {!!videoRef ? (
                 <>
-                  <video loop autoPlay ref={ref} muted />
-                  <motion.canvas
-                    ref={canvasRef}
-                    animate={photoControls}
-                    transformTemplate={({ scale }) =>
-                      `translate(-50%, -50%) scale(${scale})`
-                    }
-                  ></motion.canvas>
-                  <motion.canvas
-                    ref={canvasOverlayRef}
-                    animate={photoControls}
-                    transformTemplate={({ scale }) =>
-                      `translate(-50%, -50%) scale(${scale})`
-                    }
-                  ></motion.canvas>
-                  <motion.div
-                    id="test"
-                    animate={photoControls}
-                  ></motion.div>
+                  <video loop autoPlay ref={videoRef} muted />
+                  <PhotoWrapper animate={photoControls}>
+                    <motion.canvas ref={canvasRef}></motion.canvas>
+                    <motion.canvas
+                      ref={canvasOverlayRef}
+                    ></motion.canvas>
+                  </PhotoWrapper>
                 </>
               ) : null}
             </VideoBox>
