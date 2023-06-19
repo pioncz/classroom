@@ -39,7 +39,8 @@ const App = () => {
     }, 2000);
   }, []);
 
-  const appReady = videoInitialized && timeoutReady && faceApiReady;
+  const appReady =
+    videoInitialized && timeoutReady && faceApiReady && false;
 
   const welcomeClickHandler = () => {
     if (!firstClick) {
@@ -56,7 +57,9 @@ const App = () => {
           setVideoInitialized(true);
         }}
       />
-      {!appReady ? <Welcome onClick={welcomeClickHandler} /> : null}
+      {!appReady ? (
+        <Welcome onClick={welcomeClickHandler} clicked={firstClick} />
+      ) : null}
     </Root>
   );
 };

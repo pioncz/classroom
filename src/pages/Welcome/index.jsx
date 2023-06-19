@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Heading, Spinner } from 'theme-ui';
 
-function Welcome({ onClick }) {
+function Welcome({ onClick, clicked }) {
   return (
     <>
       <Box
@@ -29,9 +29,20 @@ function Welcome({ onClick }) {
             top: '20%',
           }}
         >
-          Welcome to Teamz
+          Welcome to Classroom
         </Heading>
-        <Spinner size={60} strokeWidth={2} />
+        {clicked && <Spinner size={60} strokeWidth={2} />}
+        {!clicked && (
+          <Heading
+            as="h5"
+            sx={{
+              position: 'absolute',
+              top: '60%',
+            }}
+          >
+            Tap anywhere to start
+          </Heading>
+        )}
       </Box>
     </>
   );
