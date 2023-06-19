@@ -95,6 +95,7 @@ const MovePhotoDurationInSeconds = 3.5;
 
 function Classroom({ firstClick, onInitialized }) {
   const [initialized, setInitialized] = useState(false);
+  const [photos, setPhotos] = useState([]);
   const videoRef = useRef();
   const videoContainerRef0 = useRef();
   const videoContainerRef1 = useRef();
@@ -108,6 +109,41 @@ function Classroom({ firstClick, onInitialized }) {
   const initRef = useRef(false);
   const currentPhoto = useRef(0);
   const photoControls = useAnimation();
+  const videos = [
+    {
+      id: 0,
+      containerRef: videoContainerRef0,
+    },
+    {
+      id: 1,
+      containerRef: videoContainerRef1,
+    },
+    {
+      id: 2,
+      containerRef: videoContainerRef2,
+    },
+    {
+      id: 3,
+      containerRef: videoContainerRef3,
+    },
+    {
+      id: 4,
+      containerRef: videoContainerRef4,
+    },
+    {
+      id: 5,
+      containerRef: videoContainerRef5,
+    },
+    {
+      id: 6,
+      videoRef: videoRef,
+      containerRef: videoContainerRef6,
+    },
+    {
+      id: 7,
+      containerRef: videoContainerRef7,
+    },
+  ];
 
   useEffect(() => {
     if (initialized) {
@@ -218,11 +254,6 @@ function Classroom({ firstClick, onInitialized }) {
               currentPhoto.current
             ].containerRef.current.getBoundingClientRect();
 
-          currentPhoto.current = getNextNonRefVideoIdx(
-            currentPhoto.current,
-            videos,
-          );
-
           photoControls
             .start({
               opacity: [0, 1, 1, 1, 1],
@@ -241,7 +272,20 @@ function Classroom({ firstClick, onInitialized }) {
               },
             })
             .then(() => {
-              console.log('XXXX');
+              const imageDataURL = canvasRef.current.toDataURL();
+              setPhotos((p) =>
+                p.length <= currentPhoto.current
+                  ? [...p, imageDataURL]
+                  : p.map((item, i) =>
+                      i === currentPhoto.current
+                        ? imageDataURL
+                        : item,
+                    ),
+              );
+              currentPhoto.current = getNextNonRefVideoIdx(
+                currentPhoto.current,
+                videos,
+              );
             });
         }
         initRef.current = true;
@@ -266,54 +310,26 @@ function Classroom({ firstClick, onInitialized }) {
     }
   }, [firstClick, initialized]);
 
-  const videos = [
-    {
-      id: 0,
-      containerRef: videoContainerRef0,
-    },
-    {
-      id: 1,
-      containerRef: videoContainerRef1,
-    },
-    {
-      id: 2,
-      containerRef: videoContainerRef2,
-    },
-    {
-      id: 3,
-      containerRef: videoContainerRef3,
-    },
-    {
-      id: 4,
-      containerRef: videoContainerRef4,
-    },
-    {
-      id: 5,
-      containerRef: videoContainerRef5,
-    },
-    {
-      id: 6,
-      videoRef: videoRef,
-      containerRef: videoContainerRef6,
-    },
-    {
-      id: 7,
-      containerRef: videoContainerRef7,
-    },
-  ];
-
   return (
     <Root>
       <TopBar />
       <MainContent>
         <VideoGrid>
-          {videos.map(({ id, videoRef, containerRef }) => (
+          {videos.map(({ id, videoRef, containerRef }, i) => (
             <VideoBox
               key={id}
               selected={!!videoRef}
               ref={containerRef}
             >
-              <StyledSpinner size={60} strokeWidth={2} />
+              {photos[i] ? (
+                <img
+                  src={photos[i]}
+                  style={{ width: '100%', height: '100%' }}
+                  alt="from camera"
+                />
+              ) : (
+                <StyledSpinner size={60} strokeWidth={2} />
+              )}
               {!!videoRef ? (
                 <>
                   <video loop autoPlay ref={videoRef} muted />
