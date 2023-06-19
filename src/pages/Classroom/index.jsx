@@ -10,6 +10,7 @@ import { motion, useAnimation } from 'framer-motion';
 import { Spinner } from 'theme-ui';
 import TopBar from './TopBar';
 import ChatBar from './ChatBar';
+import { getNextNonRefVideoIdx } from './Helpers';
 
 const Root = styled.div`
   width: 100%;
@@ -104,6 +105,7 @@ function Classroom({ firstClick, onInitialized }) {
   const videoContainerRef7 = useRef();
   const canvasRef = useRef();
   const initRef = useRef(false);
+  const currentPhoto = useRef(0);
   const photoControls = useAnimation();
 
   useEffect(() => {
@@ -173,6 +175,10 @@ function Classroom({ firstClick, onInitialized }) {
           return;
         }
 
+        const { borderWidth } = window.getComputedStyle(
+          videoContainer.containerRef.current,
+        );
+        const borderWidthParsed = parseInt(borderWidth, 10);
         const {
           x: videoContainerX,
           y: videoContainerY,
@@ -183,8 +189,8 @@ function Classroom({ firstClick, onInitialized }) {
         photoControls.set({
           width: videoContainerWidth - 6,
           height: videoContainerHeight - 6,
-          top: videoContainerY + 3,
-          left: videoContainerX + 3,
+          top: videoContainerY + borderWidthParsed,
+          left: videoContainerX + borderWidthParsed,
           opacity: 0,
           filter: 'brightness(0)',
           scale: 1,
@@ -207,12 +213,19 @@ function Classroom({ firstClick, onInitialized }) {
 
         if (initRef.current) {
           const { x: destinationX, y: destinationY } =
-            videos[0].containerRef.current.getBoundingClientRect();
+            videos[
+              currentPhoto.current
+            ].containerRef.current.getBoundingClientRect();
+
+          currentPhoto.current = getNextNonRefVideoIdx(
+            currentPhoto.current,
+            videos,
+          );
 
           photoControls.start({
             opacity: [0, 1, 1, 1, 1],
-            top: destinationY + 3,
-            left: destinationX + 3,
+            top: destinationY + borderWidthParsed,
+            left: destinationX + borderWidthParsed,
             filter: [
               'brightness(0)',
               'brightness(4)',
