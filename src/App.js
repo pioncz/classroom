@@ -10,7 +10,7 @@ const Root = styled.div`
   width: 100%;
   height: 100%;
 `;
-
+console.log('test');
 const App = () => {
   const [faceApiReady, setFaceApiReady] = useState(false);
   const [timeoutReady, setTimeoutReady] = useState(false);
@@ -19,7 +19,7 @@ const App = () => {
 
   useEffect(() => {
     faceapi
-      .loadTinyFaceDetectorModel('/classroom/models')
+      .loadTinyFaceDetectorModel('/models')
       .then((x) => {
         setFaceApiReady(true);
       })
