@@ -10,7 +10,12 @@ const Root = styled.div`
   width: 100%;
   height: 100%;
 `;
-console.log('test');
+
+const modelsPath =
+  process.env.NODE_ENV === 'development'
+    ? '/models'
+    : '/classroom/models';
+
 const App = () => {
   const [faceApiReady, setFaceApiReady] = useState(false);
   const [timeoutReady, setTimeoutReady] = useState(false);
@@ -19,7 +24,7 @@ const App = () => {
 
   useEffect(() => {
     faceapi
-      .loadTinyFaceDetectorModel('/models')
+      .loadTinyFaceDetectorModel(modelsPath)
       .then((x) => {
         setFaceApiReady(true);
       })
