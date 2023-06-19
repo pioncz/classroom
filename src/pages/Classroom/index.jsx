@@ -90,7 +90,8 @@ const StyledChatBar = styled(ChatBar)`
   flex: 0 0 350px;
 `;
 
-const PhotoInterval = 5 * 1000;
+const BetweenPhotosInterval = 5 * 1000;
+const MovePhotoDurationInSeconds = 3.5;
 
 function Classroom({ firstClick, onInitialized }) {
   const [initialized, setInitialized] = useState(false);
@@ -171,7 +172,7 @@ function Classroom({ firstClick, onInitialized }) {
         setInitialized(true);
         if (!detections.length) {
           initRef.current = true;
-          setTimeout(handleClickRoot, PhotoInterval);
+          setTimeout(handleClickRoot, BetweenPhotosInterval);
           return;
         }
 
@@ -222,25 +223,29 @@ function Classroom({ firstClick, onInitialized }) {
             videos,
           );
 
-          photoControls.start({
-            opacity: [0, 1, 1, 1, 1],
-            top: destinationY + borderWidthParsed,
-            left: destinationX + borderWidthParsed,
-            filter: [
-              'brightness(0)',
-              'brightness(4)',
-              'brightness(1)',
-              'brightness(1)',
-              'brightness(1)',
-            ],
-            transition: {
-              times: [0, 0.02, 0.06, 0.8, 1],
-              duration: 3.5,
-            },
-          });
+          photoControls
+            .start({
+              opacity: [0, 1, 1, 1, 1],
+              top: destinationY + borderWidthParsed,
+              left: destinationX + borderWidthParsed,
+              filter: [
+                'brightness(0)',
+                'brightness(4)',
+                'brightness(1)',
+                'brightness(1)',
+                'brightness(1)',
+              ],
+              transition: {
+                times: [0, 0.02, 0.06, 0.8, 1],
+                duration: MovePhotoDurationInSeconds,
+              },
+            })
+            .then(() => {
+              console.log('XXXX');
+            });
         }
         initRef.current = true;
-        setTimeout(handleClickRoot, PhotoInterval);
+        setTimeout(handleClickRoot, BetweenPhotosInterval);
       });
   }, [photoControls, initialized]);
 
@@ -256,7 +261,7 @@ function Classroom({ firstClick, onInitialized }) {
           videoRef.current.srcObject = stream;
           videoRef.current.play();
 
-          setTimeout(handleClickRoot, PhotoInterval);
+          setTimeout(handleClickRoot, BetweenPhotosInterval);
         });
     }
   }, [firstClick, initialized]);
@@ -312,13 +317,13 @@ function Classroom({ firstClick, onInitialized }) {
               {!!videoRef ? (
                 <>
                   <video loop autoPlay ref={videoRef} muted />
-                  <PhotoWrapper animate={photoControls}>
-                    <motion.canvas ref={canvasRef}></motion.canvas>
-                  </PhotoWrapper>
                 </>
               ) : null}
             </VideoBox>
           ))}
+          <PhotoWrapper animate={photoControls}>
+            <motion.canvas ref={canvasRef}></motion.canvas>
+          </PhotoWrapper>
         </VideoGrid>
         <StyledChatBar />
       </MainContent>
