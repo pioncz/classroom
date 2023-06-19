@@ -73,6 +73,8 @@ const PhotoWrapper = styled(motion.div)`
 
   canvas {
     position: absolute;
+    width: 100%;
+    height: 100%;
   }
 `;
 
@@ -101,7 +103,6 @@ function Classroom({ firstClick, onInitialized }) {
   const videoContainerRef6 = useRef();
   const videoContainerRef7 = useRef();
   const canvasRef = useRef();
-  const canvasOverlayRef = useRef();
   const initRef = useRef(false);
   const photoControls = useAnimation();
 
@@ -115,13 +116,16 @@ function Classroom({ firstClick, onInitialized }) {
     console.log('Start making photo');
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const canvasOverlay = canvasOverlayRef.current;
     const { videoHeight: height, videoWidth: width } = video;
 
     if (!width || !height) return;
 
     const { width: elWidth, height: elHeight } =
       video.getBoundingClientRect();
+
+    const videoContainer = videos.find((vC) => !!vC.videoRef);
+
+    if (!videoContainer?.containerRef?.current) return;
 
     let newHeight;
     let newWidth;
@@ -136,20 +140,25 @@ function Classroom({ firstClick, onInitialized }) {
       newHeight = elWidth * (width / height);
     }
 
-    canvas.width = newWidth;
-    canvas.height = newHeight;
-    canvasOverlay.width = newWidth;
-    canvasOverlay.height = newHeight;
+    const diffWidth = elWidth - newWidth;
+    const diffHeight = elHeight - newHeight;
 
-    canvasRef.current
-      .getContext('2d')
-      .drawImage(
-        videoRef.current,
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height,
-      );
+    canvas.width = elWidth;
+    canvas.height = elHeight;
+
+    const canvasCtx = canvasRef.current.getContext('2d');
+    canvasCtx.beginPath();
+    canvasCtx.rect(0, 0, elWidth, elHeight);
+    canvasCtx.fillStyle = 'black';
+    canvasCtx.fill();
+    canvasCtx.drawImage(
+      videoRef.current,
+      diffWidth / 2,
+      diffHeight / 2,
+      newWidth,
+      newHeight,
+    );
+    canvasCtx.closePath();
 
     faceapi
       .detectAllFaces(
@@ -163,10 +172,6 @@ function Classroom({ firstClick, onInitialized }) {
           setTimeout(handleClickRoot, PhotoInterval);
           return;
         }
-
-        const videoContainer = videos.find((vC) => !!vC.videoRef);
-
-        if (!videoContainer?.containerRef?.current) return;
 
         const {
           x: videoContainerX,
@@ -186,8 +191,6 @@ function Classroom({ firstClick, onInitialized }) {
         });
 
         // Draw rectange
-        const { width, height } = canvasOverlayRef.current;
-        const ctx = canvasOverlayRef.current.getContext('2d');
         const {
           left,
           top,
@@ -195,13 +198,12 @@ function Classroom({ firstClick, onInitialized }) {
           height: heightDetection,
         } = detections[0].box;
 
-        ctx.clearRect(0, 0, width, height);
-        ctx.beginPath();
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = 2;
-        ctx.rect(left, top, widthDetection, heightDetection);
-        ctx.stroke();
-        ctx.closePath();
+        canvasCtx.beginPath();
+        canvasCtx.strokeStyle = 'red';
+        canvasCtx.lineWidth = 2;
+        canvasCtx.rect(left, top, widthDetection, heightDetection);
+        canvasCtx.stroke();
+        canvasCtx.closePath();
 
         if (initRef.current) {
           const { x: destinationX, y: destinationY } =
@@ -299,9 +301,6 @@ function Classroom({ firstClick, onInitialized }) {
                   <video loop autoPlay ref={videoRef} muted />
                   <PhotoWrapper animate={photoControls}>
                     <motion.canvas ref={canvasRef}></motion.canvas>
-                    <motion.canvas
-                      ref={canvasOverlayRef}
-                    ></motion.canvas>
                   </PhotoWrapper>
                 </>
               ) : null}
