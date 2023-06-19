@@ -2,12 +2,12 @@ import React, {
   useEffect,
   useRef,
   useState,
-  memo,
   useCallback,
 } from 'react';
 import styled from '@emotion/styled';
 import * as faceapi from 'face-api.js';
 import { motion, useAnimation } from 'framer-motion';
+import { Spinner } from 'theme-ui';
 import TopBar from './TopBar';
 import ChatBar from './ChatBar';
 
@@ -42,7 +42,7 @@ const VideoBox = styled.div`
   overflow: hidden;
 
   border: 3px solid
-    ${(props) => (props.selected ? '#69ffac' : 'transparent')};
+    ${(props) => (props.selected ? '#69ffac' : '#232323')};
 
   &::after {
     content: '';
@@ -72,6 +72,13 @@ const VideoBox = styled.div`
     width: 100%;
     height: 100%;
   }
+`;
+
+const StyledSpinner = styled(Spinner)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
 
 const StyledChatBar = styled(ChatBar)`
@@ -214,33 +221,21 @@ function Classroom({ firstClick, onInitialized }) {
   const videos = [
     {
       id: 0,
-      type: 'video/mp4',
-      src: './mov_bbb.webm',
     },
     {
       id: 1,
-      type: 'video/webm',
-      src: './flower.webm',
     },
     {
       id: 2,
-      type: 'video/mp4',
-      src: './mov_bbb.mp4',
     },
     {
       id: 3,
-      type: 'video/webm',
-      src: './flower.webm',
     },
     {
       id: 4,
-      type: 'video/mp4',
-      src: './mov_bbb.mp4',
     },
     {
       id: 5,
-      type: 'video/webm',
-      src: './flower.webm',
     },
     {
       id: 6,
@@ -248,8 +243,6 @@ function Classroom({ firstClick, onInitialized }) {
     },
     {
       id: 7,
-      type: 'video/mp4',
-      src: './mov_bbb.mp4',
     },
   ];
 
@@ -258,15 +251,12 @@ function Classroom({ firstClick, onInitialized }) {
       <TopBar />
       <MainContent>
         <VideoGrid>
-          {videos.map(({ id, type, src, ref }) => (
+          {videos.map(({ id, ref, image }) => (
             <VideoBox key={id} selected={!!ref}>
-              <video loop autoPlay ref={ref} muted>
-                {src && type ? (
-                  <source src={src} type={type}></source>
-                ) : null}
-              </video>
+              <StyledSpinner size={60} strokeWidth={2} />
               {!!ref ? (
                 <>
+                  <video loop autoPlay ref={ref} muted />
                   <motion.canvas
                     ref={canvasRef}
                     animate={photoControls}

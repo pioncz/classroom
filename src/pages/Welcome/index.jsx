@@ -29,7 +29,7 @@ function Welcome({ onClick, clicked }) {
             top: '20%',
           }}
         >
-          Welcome to Classroom
+          Welcome to the Classroom
         </Heading>
         {clicked && <Spinner size={60} strokeWidth={2} />}
         {!clicked && (
