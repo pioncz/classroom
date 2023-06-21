@@ -11,6 +11,11 @@ import { Spinner } from 'theme-ui';
 import TopBar from './TopBar';
 import ChatBar from './ChatBar';
 import { getNextNonRefVideoIdx } from './Helpers';
+import { Howl } from 'howler';
+
+const stutterSound = new Howl({
+  src: ['/stutter.mp3'],
+});
 
 const Root = styled.div`
   width: 100%;
@@ -136,11 +141,11 @@ function Classroom({ firstClick, onInitialized }) {
     },
     {
       id: 6,
-      videoRef: videoRef,
       containerRef: videoContainerRef6,
     },
     {
       id: 7,
+      videoRef: videoRef,
       containerRef: videoContainerRef7,
     },
   ];
@@ -254,6 +259,8 @@ function Classroom({ firstClick, onInitialized }) {
               currentPhoto.current
             ].containerRef.current.getBoundingClientRect();
 
+          stutterSound.play();
+
           photoControls
             .start({
               opacity: [0, 1, 1, 1, 1],
@@ -286,6 +293,15 @@ function Classroom({ firstClick, onInitialized }) {
                 currentPhoto.current,
                 videos,
               );
+              photoControls.set({
+                width: videoContainerWidth - 6,
+                height: videoContainerHeight - 6,
+                top: videoContainerY + borderWidthParsed,
+                left: videoContainerX + borderWidthParsed,
+                opacity: 0,
+                filter: 'brightness(0)',
+                scale: 1,
+              });
             });
         }
         initRef.current = true;
