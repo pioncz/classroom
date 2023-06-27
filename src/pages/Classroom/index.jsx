@@ -13,8 +13,13 @@ import ChatBar from './ChatBar';
 import { getNextNonRefVideoIdx } from './Helpers';
 import { Howl } from 'howler';
 
+const stutterPath =
+  process.env.NODE_ENV === 'development'
+    ? '/stutter.mp3'
+    : '/classroom/stutter.mp3';
+
 const stutterSound = new Howl({
-  src: ['/stutter.mp3'],
+  src: [stutterPath],
 });
 
 const Root = styled.div`
